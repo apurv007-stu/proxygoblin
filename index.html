@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f6f2">
+<title>Attendance Calculator</title>
+<style>
+:root {
+  --ink:#202a27;
+  --muted:#697570;
+  --green:#176b52;
+  --pale:#e7f1eb;
+  --line:#e5e9e4;
+  --bg:#f5f6f2;
+  --white:#fff;
+  --amber:#a15c10;
+  --red:#a7423d
+}
+* {
+  box-sizing:border-box
+}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;
+  padding:38px 20px 50px
+}
+main {
+  max-width:920px;
+  margin:auto
+}
+.top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:26px
+}
+.eyebrow {
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  color:var(--green);
+  font-weight:750;
+  margin:0 0 8px
+}
+h1 {
+  font-size:clamp(30px,5vw,43px);
+  letter-spacing:-.045em;
+  line-height:1.1;
+  margin:0 0 10px
+}
+.intro {
+  margin:0;
+  color:var(--muted);
+  max-width:540px
+}
+.badge {
+  white-space:nowrap;
+  border:1px solid #dce6de;
+  background:#edf4ef;
+  color:#315b48;
+  padding:9px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700
+}
+.layout {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 270px;
+  gap:18px;
+  align-items:start
+}
+.card {
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 7px 24px #22352b08
+}
+.card h2 {
+  font-size:17px;
+  letter-spacing:-.02em;
+  margin:0 0 5px
+}
+.hint {
+  margin:0 0 20px;
+  color:var(--muted);
+  font-size:13px
+}
+.field {
+  margin:0 0 19px
+}
+.field:last-child {
+  margin-bottom:0
+}
+label {
+  display:block;
+  font-size:13px;
+  font-weight:680;
+  margin-bottom:7px
+}
+input {
+  width:100%;
+  height:48px;
+  border:1px solid #dce2dc;
+  border-radius:10px;
+  padding:0 13px;
+  font:inherit;
+  color:var(--ink);
+  background:#fff;
+  outline:none;
+  transition:.15s
+}
+input:focus {
+  border-color:var(--green);
+  box-shadow:0 0 0 3px #176b5218
+}
+input::placeholder {
+  color:#a0aaa3
+}
+.unit {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:6px
+}
+.results {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:22px
+}
+.result {
+  background:#f7f9f6;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:16px
+}
+.result .label {
+  font-size:12px;
+  color:var(--muted);
+  font-weight:650
+}
+.value {
+  font-size:30px;
+  letter-spacing:-.045em;
+  font-weight:760;
+  margin:4px 0 1px;
+  font-variant-numeric:tabular-nums
+}
+.caption {
+  font-size:12px;
+  color:var(--muted)
+}
+.progress {
+  height:8px;
+  border-radius:20px;
+  background:#e9ede8;
+  overflow:hidden;
+  margin-top:14px
+}
+.progress span {
+  display:block;
+  width:0;
+  height:100%;
+  background:var(--green);
+  border-radius:20px;
+  transition:width .2s
+}
+.result.projected .value {
+  color:var(--green)
+}
+.result.projected.below .value {
+  color:var(--red)
+}
+.result.recovery {
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  background:#edf4ef
+}
+.result.recovery .value {
+  color:var(--green);
+  font-size:26px
+}
+.result.recovery .progress {
+  display:none
+}
+.side {
+  padding:21px;
+  position:sticky;
+  top:18px
+}
+.side .mini {
+  font-size:11px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--green);
+  font-weight:750
+}
+.side .count {
+  font-size:48px;
+  line-height:1.15;
+  letter-spacing:-.06em;
+  font-weight:780;
+  margin:12px 0 4px;
+  font-variant-numeric:tabular-nums
+}
+.side p {
+  margin:0;
+  color:var(--muted);
+  font-size:13px
+}
+.side .rule {
+  border-top:1px solid var(--line);
+  margin:18px 0 14px
+}
+.side .threshold {
+  font-size:13px;
+  color:var(--ink);
+  font-weight:680
+}
+.status {
+  font-size:12px!important;
+  margin-top:10px!important
+}
+.status.good {
+  color:var(--green)
+}
+.status.warn {
+  color:var(--amber)
+}
+.footer {
+  font-size:12px;
+  color:var(--muted);
+  margin:16px 2px 0
+}
+.reset {
+  border:0;
+  background:none;
+  color:var(--muted);
+  font:inherit;
+  font-size:12px;
+  padding:5px 0;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:3px
+}
+.sidehead {
+  display:flex;
+  justify-content:space-between;
+  align-items:center
+}
+@media(max-width:700px) {
+  body {
+    padding:26px 15px 38px
+  }
+  .layout {
+    grid-template-columns:1fr
+  }
+  .side {
+    position:static;
+    grid-row:1
+  }
+  .side .count {
+    font-size:42px
+  }
+  .top {
+    display:block
+  }
+  .badge {
+    display:inline-block;
+    margin-top:15px
+  }
+  .card {
+    padding:20px
+  }
+  .results {
+    grid-template-columns:1fr 1fr
+  }
+}
+@media(max-width:390px) {
+  .results {
+    grid-template-columns:1fr
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div><p class="eyebrow">Your semester, at a glance</p><h1>Attendance calculator</h1><p class="intro">Track your attendance, plan absences, and see how many days it takes to reach your goal.</p></div>
+    <div class="badge" id="summary-badge">7 classes per day · 75% target</div>
+  </header>
+  <div class="layout">
+    <section class="card" aria-labelledby="current-title">
+      <h2 id="current-title">Your attendance</h2><p class="hint">Enter how many class days have happened and how many classes you attended.</p>
+      <div class="field"><label for="days">Days of classes held so far</label><input id="days" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 40"><div class="unit" id="days-note">Total classes held is calculated as days × classes per day.</div></div>
+      <div class="field"><label for="classes-per-day">Classes in a day</label><input id="classes-per-day" type="number" min="1" step="1" inputmode="numeric" value="7"></div>
+      <div class="field"><label for="attended">Classes you attended</label><input id="attended" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 250"><div class="unit" id="held-note">Enter your class days to see the total classes held.</div></div>
+      <div class="field"><label for="planned">Days you plan to be absent</label><input id="planned" type="number" min="0" step="1" inputmode="numeric" placeholder="0"><div class="unit" id="planned-note">Assumes each absent day means missing all classes that day.</div></div>
+      <div class="field"><label for="target">Attendance percentage you want to reach</label><input id="target" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="75"><div class="unit" id="target-note">We’ll count full days attending all classes.</div></div>
+      <div class="results" aria-live="polite">
+        <div class="result"><div class="label">Current attendance</div><div class="value" id="current">—</div><div class="caption" id="current-detail">Enter your figures to calculate</div><div class="progress"><span id="current-bar"></span></div></div>
+        <div class="result projected" id="projected-card"><div class="label">After planned absence</div><div class="value" id="projected">—</div><div class="caption" id="projected-detail">Your projected percentage</div><div class="progress"><span id="projected-bar"></span></div></div>
+        <div class="result recovery"><div><div class="label">Days to reach your target</div><div class="caption" id="recovery-detail">Enter your figures and target</div></div><div class="value" id="recovery">—</div></div>
+      </div>
+      <p class="footer" id="calculation-note">Calculation: classes attended ÷ total classes × 100. Future absent days add all classes for that day to the total.</p>
+    </section>
+    <aside class="card side" aria-labelledby="buffer-title">
+      <div class="sidehead"><div class="mini" id="buffer-title">Absence buffer</div><button class="reset" id="reset" type="button">Reset</button></div>
+      <div class="count" id="buffer">—</div><p>more full day<span id="plural">s</span> you can miss and stay at or above 75%.</p>
+      <div class="rule"></div><div class="threshold">Minimum target: 75%</div>
+      <p class="status" id="buffer-status">Enter your attendance to see your buffer.</p>
+    </aside>
+  </div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const fields = ['days', 'classes-per-day', 'attended', 'planned', 'target'].map($);
+const fmt = n => Number.isFinite(n) ? `${n.toFixed(1)}%` : '—';
+
+function readInt(el) {
+  if (el.value.trim() === '') return null;
+
+  const n = Number(el.value);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null;
+}
+
+function update() {
+  const days = readInt($('days'));
+  const classesPerDay = readInt($('classes-per-day'));
+  const attended = readInt($('attended'));
+  const planned = readInt($('planned')) ?? 0;
+  const targetValue = $('target').value.trim() === ''
+    ? null
+    : Number($('target').value);
+  const target = Number.isFinite(targetValue) && targetValue > 0 && targetValue <= 100
+    ? targetValue / 100
+    : null;
+  const held = days === null || classesPerDay === null || classesPerDay === 0
+    ? null
+    : days * classesPerDay;
+
+  $('summary-badge').textContent = `${classesPerDay ?? '—'} classes per day · 75% target`;
+  $('days-note').textContent = `Total classes held is calculated as days × ${classesPerDay ?? 'classes per day'}.`;
+  $('planned-note').textContent = `Assumes each absent day means missing all ${classesPerDay ?? 'classes'} classes.`;
+  $('target-note').textContent = `We’ll count full days attending all ${classesPerDay ?? 'classes'} classes.`;
+  $('calculation-note').textContent = `Calculation: classes attended ÷ total classes × 100. Future absent days add ${classesPerDay ?? 'all'} classes each to the total.`;
+
+  $('held-note').textContent = held === null
+    ? classesPerDay === null || classesPerDay === 0
+      ? 'Enter at least 1 class per day to calculate total classes held.'
+      : 'Enter your class days to see the total classes held.'
+    : `${held} classes held so far.`;
+
+  const valid = held !== null && attended !== null && held > 0 && attended <= held;
+  const cur = valid ? attended / held * 100 : null;
+
+  $('current').textContent = fmt(cur);
+  $('current-detail').textContent = valid
+    ? `${attended} of ${held} classes attended`
+    : 'Enter valid figures to calculate';
+  $('current-bar').style.width = `${Math.min(100, cur || 0)}%`;
+
+  const future = valid ? attended / (held + planned * classesPerDay) * 100 : null;
+  $('projected').textContent = fmt(future);
+  $('projected-detail').textContent = valid
+    ? `${planned} planned absent day${planned === 1 ? '' : 's'}`
+    : 'Your projected percentage';
+  $('projected-bar').style.width = `${Math.min(100, future || 0)}%`;
+  $('projected-card').classList.toggle('below', future !== null && future < 75);
+
+  const recovery = $('recovery');
+  const recoveryDetail = $('recovery-detail');
+
+  if (!valid || target === null) {
+    recovery.textContent = '—';
+    recoveryDetail.textContent = target === null
+      ? 'Choose a target above 0% and up to 100%.'
+      : 'Enter valid attendance figures.';
+  } else {
+    const afterAbsencesTotal = held + planned * classesPerDay;
+
+    if (attended / afterAbsencesTotal >= target) {
+      recovery.textContent = '0 days';
+      recoveryDetail.textContent = `You’ll already be at or above ${$('target').value}% after your planned absences.`;
+    } else if (target >= 1) {
+      recovery.textContent = 'Not reachable';
+      recoveryDetail.textContent = 'A 100% target cannot be reached after any missed classes.';
+    } else {
+      const need = Math.ceil((target * afterAbsencesTotal - attended) / (classesPerDay * (1 - target)) - 1e-10);
+      recovery.textContent = `${need} day${need === 1 ? '' : 's'}`;
+      recoveryDetail.textContent = `Attend all ${classesPerDay} classes each day to reach ${$('target').value}%, after planned absences.`;
+    }
+  }
+
+  if (!valid) {
+    $('buffer').textContent = '—';
+    $('plural').textContent = 's';
+    $('buffer-status').textContent = held === 0
+      ? 'Enter at least one day of classes held.'
+      : attended !== null && held !== null && attended > held
+        ? 'Attended classes cannot exceed classes held.'
+        : 'Enter your attendance to see your buffer.';
+    $('buffer-status').className = 'status';
+    return;
+  }
+
+  const max = Math.max(0, Math.floor((attended / 0.75 - held) / classesPerDay + 1e-9));
+  $('buffer').textContent = max;
+  $('plural').textContent = max === 1 ? '' : 's';
+
+  if (cur < 75) {
+    $('buffer-status').textContent = 'You are currently below 75%. Attend future classes to raise your percentage.';
+    $('buffer-status').className = 'status warn';
+  } else {
+    $('buffer-status').textContent = max === 0
+      ? 'No full absent days available before dropping below 75%.'
+      : `You can miss up to ${max} full day${max === 1 ? '' : 's'} from here.`;
+    $('buffer-status').className = 'status good';
+  }
+}
+
+fields.forEach(el => el.addEventListener('input', update));
+$('reset').addEventListener('click', () => {
+  fields.forEach(el => el.value = '');
+  $('classes-per-day').value = '7';
+  $('target').value = '75';
+  update();
+  $('days').focus();
+});
+update();
+</script>
+</body></html>
