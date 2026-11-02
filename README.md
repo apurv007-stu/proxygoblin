@@ -13,3 +13,4 @@ Enter the number of class days held, classes per day, classes attended, planned 
 5. Review the results.
 
 This is a planning aid. Check your institution’s attendance rules for official requirements.
+[Open the live attendance calculator](https://proxygoblin.netlify.app/)
